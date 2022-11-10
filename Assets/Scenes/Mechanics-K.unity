@@ -260,8 +260,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 4
+  jumpForce: 80
+  grav: 1
   horizontalInput: 0
   verticalInput: 0
+  jump: 32
+  playerMove: 0
+  playerAir: 0
 --- !u!1 &630268863
 GameObject:
   m_ObjectHideFlags: 0
