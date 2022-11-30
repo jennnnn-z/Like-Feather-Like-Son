@@ -5,9 +5,10 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 4;
-    private float jumpForce = 6;
-    private float grav = 1f;
+    private float jumpForce = 4;
+    private float grav = 8f;
     private float acceleration;
+    public float vertVel;
     private Rigidbody2D playerRb;
 
     public float horizontalInput;
@@ -38,40 +39,42 @@ public class PlayerController : MonoBehaviour
 
         if (Mathf.Abs(verticalInput) >= 0.5f || Mathf.Abs(horizontalInput) >= 0.5f)
         {
-            if (playerMove == MoveState.Stationary)
+            transform.eulerAngles = new Vector3(0, 0, zDegrees);
+            playerRb.velocity += new Vector2(transform.up.x, transform.up.y).normalized * speed;
+
+            if (playerRb.velocity.magnitude > speed)
             {
-                transform.eulerAngles = new Vector3(0, 0, zDegrees);
-                playerRb.velocity += new Vector2(transform.up.x, transform.up.y).normalized * speed;
-                playerMove = MoveState.Moving;
+                playerRb.velocity *= speed / playerRb.velocity.magnitude;
             }
+
+            playerMove = MoveState.Moving;
         }
         else
         {
             if (playerMove == MoveState.Moving)
             {
-                playerRb.velocity -= new Vector2(transform.up.x, transform.up.y).normalized*speed;
+                playerRb.velocity -= new Vector2(transform.up.x, transform.up.y).normalized * speed;
                 playerMove = MoveState.Stationary;
             }
         }
 
+        if (playerMove == MoveState.Stationary && playerRb.velocity.magnitude > 0.00000000001f) playerRb.velocity *= 0;
+
         if (playerAir == AirState.Grounded)
         {
-            playerRb.gravityScale = 0;
+            vertVel = 0;
             if (Input.GetKeyDown(jump))
             {
-                playerRb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);
-                playerRb.gravityScale = grav;
+                Debug.Log("In");
+                vertVel = jumpForce;
                 playerAir = AirState.Rising;
-                //Change Layer
             }
         }
         else if (playerAir == AirState.Rising)
         {
-            jumpTime += Time.deltaTime;
-            Debug.Log(jumpTime);
-            if (jumpTime > 1)
+            vertVel -= grav * Time.deltaTime;
+            if (vertVel < 0)
             {
-                jumpTime = 0;
                 playerAir = AirState.Airborne;
             }
         }
@@ -79,15 +82,23 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetKey(jump))
             {
-                playerRb.gravityScale = grav/2;
+                vertVel -= (grav / 2) * Time.deltaTime;
                 playerAir = AirState.Gliding;
             }
             else
             {
-                playerRb.gravityScale = grav;
+                vertVel -= grav * Time.deltaTime;
                 playerAir = AirState.Airborne;
             }
+
+            if (vertVel < -jumpForce)
+            {
+                vertVel = 0;
+                playerAir = AirState.Grounded;
+            }
         }
+
+        transform.Translate(0, vertVel * Time.deltaTime, 0, Space.World);
     }
 
     public enum MoveState
