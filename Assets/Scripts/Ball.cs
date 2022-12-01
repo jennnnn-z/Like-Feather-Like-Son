@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Ball : MonoBehaviour
 {
     private Rigidbody2D ballRB;
     // Start is called before the first frame update
@@ -21,7 +21,5 @@ public class NewBehaviourScript : MonoBehaviour
     void Roll (float power,Vector2 direction)
     {
         ballRB.AddForce(direction * power, ForceMode2D.Impulse);
-
-
     }
 }
