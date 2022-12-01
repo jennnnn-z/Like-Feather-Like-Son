@@ -13,15 +13,23 @@ public class PlayerController : MonoBehaviour
 
     public float horizontalInput;
     public float verticalInput;
-    public KeyCode jump = KeyCode.Space;
 
     public MoveState playerMove;
     public AirState playerAir;
     public AttackState playerAttack;
 
+    private float startupTime = 0.05f;
+    private float activeTime = 0.1f;
+    private float cooldownTime = 0.4f;
+    private float actionTime = 0;
+
     public Hitbox beakBox;
 
     private float jumpTime;
+
+    /* Keys */
+    public KeyCode jump = KeyCode.Space;
+    public KeyCode poke = KeyCode.K;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +38,7 @@ public class PlayerController : MonoBehaviour
         acceleration = speed * 2;
         playerMove = MoveState.Stationary;
         playerAir = AirState.Grounded;
+        playerAttack = AttackState.Neutral;
         jumpTime = 0;
     }
 
@@ -106,7 +115,39 @@ public class PlayerController : MonoBehaviour
         transform.Translate(0, vertVel * Time.deltaTime, 0, Space.World);
 
         /* Hitbox State */
-        
+        switch (playerAttack) {
+            case AttackState.Neutral:
+                if (Input.GetKeyDown(poke)) {
+                    playerAttack = AttackState.Startup;
+                    actionTime += Time.deltaTime;
+                }
+                break;
+            case AttackState.Startup:
+                if (actionTime >= startupTime) {
+                    playerAttack = AttackState.Active;
+                    beakBox.gameObject.SetActive(true);
+                    actionTime = 0;
+                }
+                actionTime += Time.deltaTime;
+                break;
+            case AttackState.Active:
+                if (actionTime >= activeTime)
+                {
+                    playerAttack = AttackState.Cooldown;
+                    beakBox.gameObject.SetActive(false);
+                    actionTime = 0;
+                }
+                actionTime += Time.deltaTime;
+                break;
+            case AttackState.Cooldown:
+                if (actionTime >= cooldownTime)
+                {
+                    playerAttack = AttackState.Neutral;
+                    actionTime = 0;
+                }
+                actionTime += Time.deltaTime;
+                break;
+        }
     }
 
     public enum MoveState
@@ -125,6 +166,7 @@ public class PlayerController : MonoBehaviour
 
     public enum AttackState
     {
+        Neutral,
         Startup,
         Active,
         Cooldown
