@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
 
     public MoveState playerMove;
     public AirState playerAir;
+    public AttackState playerAttack;
+
+    public Hitbox beakBox;
 
     private float jumpTime;
 
@@ -33,6 +36,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /* Movement State*/
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
         float zDegrees = Vector2.SignedAngle(new Vector2(0, 1), new Vector2(horizontalInput, verticalInput));
@@ -58,6 +62,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        /*Airborne State*/
         if (playerMove == MoveState.Stationary && playerRb.velocity.magnitude > 0.00000000001f) playerRb.velocity *= 0;
 
         if (playerAir == AirState.Grounded)
@@ -99,6 +104,9 @@ public class PlayerController : MonoBehaviour
         }
 
         transform.Translate(0, vertVel * Time.deltaTime, 0, Space.World);
+
+        /* Hitbox State */
+        
     }
 
     public enum MoveState
@@ -115,5 +123,13 @@ public class PlayerController : MonoBehaviour
         Gliding
     }
 
+    public enum AttackState
+    {
+        Startup,
+        Active,
+        Cooldown
+    }
+
     //Layer Trigger should also set state to grounded.
+    //TODO: On collision with box or ball, if higher, set state to grounded
 }
