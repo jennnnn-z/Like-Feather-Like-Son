@@ -14,9 +14,10 @@ public class Box : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
-    void Slide(float power, Vector2 direction)
+
+    public void Slide(float power, Vector2 direction)
     {
         boxRB.AddForce(direction * power, ForceMode2D.Impulse);
     }
