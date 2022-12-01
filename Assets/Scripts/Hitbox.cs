@@ -18,14 +18,14 @@ public class Hitbox : MonoBehaviour
         
     }
 
-    public void OnTriggerEnter(Collider targetCollider)
+    public void OnTriggerEnter2D(Collider2D targetCollider)
     {
         Vector2 direction = (targetCollider.gameObject.transform.position - source.gameObject.transform.position).normalized;
-        if (gameObject.GetComponent<Box>() != null) {
-            gameObject.GetComponent<Box>().Slide(power, direction);
+        if (targetCollider.gameObject.GetComponent<Box>() != null) {
+            targetCollider.gameObject.GetComponent<Box>().Slide(power, direction);
         }
-        else if (gameObject.GetComponent<Ball>() != null) {
-            gameObject.GetComponent<Ball>().Roll(power, direction);
+        else if (targetCollider.gameObject.GetComponent<Ball>() != null) {
+            targetCollider.gameObject.GetComponent<Ball>().Roll(power, direction);
         }
     }
 }
