@@ -20,6 +20,6 @@ public class Ball : MonoBehaviour
 
     public void Roll (float power,Vector2 direction)
     {
-        ballRB.AddForce(direction * power, ForceMode2D.Impulse);
+        ballRB.AddForce(direction * power * ballRB.mass, ForceMode2D.Impulse);
     }
 }

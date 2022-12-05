@@ -19,6 +19,6 @@ public class Box : MonoBehaviour
 
     public void Slide(float power, Vector2 direction)
     {
-        boxRB.AddForce(direction * power, ForceMode2D.Impulse);
+        boxRB.AddForce(direction * power * boxRB.mass, ForceMode2D.Impulse);
     }
 }
