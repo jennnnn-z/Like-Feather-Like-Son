@@ -5,11 +5,13 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 4;
-    private float jumpForce = 4;
-    private float grav = 8f;
+    private float jumpForce = 6;
+    private float grav = 8;
     private float acceleration;
     public float vertVel;
+    public float height = 0;
     private Rigidbody2D playerRb;
+    public float lastLayer;
 
     public float horizontalInput;
     public float verticalInput;
@@ -40,6 +42,7 @@ public class PlayerController : MonoBehaviour
         playerAir = AirState.Grounded;
         playerAttack = AttackState.Neutral;
         jumpTime = 0;
+        gameObject.layer = 6;
     }
 
     // Update is called once per frame
@@ -82,6 +85,11 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("In");
                 vertVel = jumpForce;
                 playerAir = AirState.Rising;
+                //gameObject.layer++;
+                //foreach (Transform child in transform)
+                //{
+                //    child.gameObject.layer++;
+                //}
             }
         }
         else if (playerAir == AirState.Rising)
@@ -109,10 +117,20 @@ public class PlayerController : MonoBehaviour
             {
                 vertVel = 0;
                 playerAir = AirState.Grounded;
+                //gameObject.layer--;
+                //foreach (Transform child in transform)
+                //{
+                //    child.gameObject.layer--;
+                //}
             }
         }
 
         transform.Translate(0, vertVel * Time.deltaTime, 0, Space.World);
+        height += vertVel;
+        //If height falls below a layer defined threshold, lower my layer and check the area right below me
+            //If the layer is lower than my target keep falling
+            //Otherwise, land.
+
 
         /* Hitbox State */
         switch (playerAttack) {
