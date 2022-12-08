@@ -4,40 +4,47 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 4;
-    private float jumpForce = 6;
-    private float grav = 8;
-    private float acceleration;
-    public float vertVel;
-    public float height = 0;
-    private Rigidbody2D playerRb;
-    public float lastLayer;
+    [SerializeField] private float speed;
 
-    public float horizontalInput;
-    public float verticalInput;
+    [Header("Vertical Movement")]
+    [SerializeField] private float grav;
+    [SerializeField] private float vertVel;
+    [SerializeField] private float height = 0;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private float jumpTime;
 
-    public MoveState playerMove;
-    public AirState playerAir;
-    public AttackState playerAttack;
+    [Header("Objects")]
+    [SerializeField] private GameObject spriteObject;
+    [SerializeField] private Hitbox beakBox;
 
-    private float startupTime = 0.05f;
-    private float activeTime = 0.1f;
-    private float cooldownTime = 0.4f;
-    private float actionTime = 0;
+    [Header("Player States")]
+    [SerializeField] private MoveState playerMove;
+    [SerializeField] private AirState playerAir;
+    [SerializeField] private AttackState playerAttack;
 
-    public Hitbox beakBox;
+    [Header("Beak Frame Data")]
+    [SerializeField] private float startupTime = 0.05f;
+    [SerializeField] private float activeTime = 0.1f;
+    [SerializeField] private float cooldownTime = 0.4f;
+    [SerializeField] private float actionTime = 0;
 
-    private float jumpTime;
+    [Header("Animation")]
+    [SerializeField] private Sprite idle;
+    [SerializeField] private Sprite[] walking;
+    [SerializeField] private Sprite[] jumping;
+    private float direction = 1; //flip between 1 and -1
 
     /* Keys */
-    public KeyCode jump = KeyCode.Space;
-    public KeyCode poke = KeyCode.K;
+    private KeyCode jump = KeyCode.Space;
+    private KeyCode poke = KeyCode.K;
+    private Rigidbody2D playerRb;
+    private float horizontalInput;
+    private float verticalInput;
 
     // Start is called before the first frame update
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
-        acceleration = speed * 2;
         playerMove = MoveState.Stationary;
         playerAir = AirState.Grounded;
         playerAttack = AttackState.Neutral;
@@ -56,11 +63,21 @@ public class PlayerController : MonoBehaviour
         if (Mathf.Abs(verticalInput) >= 0.5f || Mathf.Abs(horizontalInput) >= 0.5f)
         {
             transform.eulerAngles = new Vector3(0, 0, zDegrees);
+            spriteObject.transform.localEulerAngles = new Vector3(0, 0, zDegrees * -1);
+            Debug.Log(zDegrees * -1);
             playerRb.velocity += new Vector2(transform.up.x, transform.up.y).normalized * speed;
 
             if (playerRb.velocity.magnitude > speed)
             {
                 playerRb.velocity *= speed / playerRb.velocity.magnitude;
+            }
+            if (horizontalInput >= 0.5f) {
+                direction = 1;
+                spriteObject.GetComponent<SpriteRenderer>().flipX = false;
+            }
+            else if (horizontalInput <= -0.5f) {
+                direction = -1;
+                spriteObject.GetComponent<SpriteRenderer>().flipX = true;
             }
 
             playerMove = MoveState.Moving;
@@ -73,9 +90,10 @@ public class PlayerController : MonoBehaviour
                 playerMove = MoveState.Stationary;
             }
         }
+        if (playerMove == MoveState.Stationary && playerRb.velocity.magnitude > 0.00000000000001f) playerRb.velocity *= 0;
 
         /*Airborne State*/
-        if (playerMove == MoveState.Stationary && playerRb.velocity.magnitude > 0.00000000001f) playerRb.velocity *= 0;
+
 
         if (playerAir == AirState.Grounded)
         {
